@@ -202,7 +202,7 @@ public class cadastroVIEW extends javax.swing.JFrame {
            resposta = dao.salvar(produtos);
 
            if (resposta == 1) {
-               JOptionPane.showMessageDialog(null, "Dados incluídos com sucesso");
+               JOptionPane.showMessageDialog(null, "Produto cadastrado com sucesso!");
                this.limparCamposEntradaDados();
                cadastroNome.requestFocus();
            } else if (resposta == 1062) {
