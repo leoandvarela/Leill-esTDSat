@@ -1,8 +1,12 @@
 package interfaces;
 
-
 import dao.ProdutosDTO;
 import dao.ProdutosDAO;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+
+
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -20,6 +24,10 @@ public class cadastroVIEW extends javax.swing.JFrame {
      */
     public cadastroVIEW() {
         initComponents();
+        
+        ProdutosDAO dao = new ProdutosDAO();
+        
+        dao.conectar();
     }
 
     /**
@@ -146,24 +154,76 @@ public class cadastroVIEW extends javax.swing.JFrame {
     }//GEN-LAST:event_cadastroNomeActionPerformed
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
-        ProdutosDTO produto = new ProdutosDTO();
-        String nome = cadastroNome.getText();
-        String valor = cadastroValor.getText();
-        String status = "A Venda";
-        produto.setNome(nome);
-        produto.setValor(Integer.parseInt(valor));
-        produto.setStatus(status);
-        
-        ProdutosDAO produtodao = new ProdutosDAO();
-        produtodao.cadastrarProduto(produto);
-        
+
+       ProdutosDTO produtos = new ProdutosDTO();
+       List<String> listaErros = new ArrayList<>();
+
+       ProdutosDAO dao = new ProdutosDAO();
+
+       boolean status;
+       int resposta;
+
+       String nome = cadastroNome.getText().trim();
+       String valorTexto = cadastroValor.getText().trim();
+
+       if (nome.isEmpty()) {
+           listaErros.add("Informe o nome!");
+       }
+
+       int valor = 0;
+       if (valorTexto.isEmpty()) {
+           listaErros.add("Informe o valor!");
+       } else {
+           try {
+               valor = Integer.parseInt(valorTexto);
+           } catch (NumberFormatException e) {
+               listaErros.add("O valor deve ser um número inteiro!");
+           }
+       }
+
+       if (!listaErros.isEmpty()) {
+           String mensagemErro = "Para cadastrar um produto, corrija o(s) erro(s) abaixo: \n\n";
+           for (String erro : listaErros) {
+               mensagemErro += erro + "\n";
+           }
+           JOptionPane.showMessageDialog(this, mensagemErro);
+           return; 
+       }
+
+       produtos.setNome(nome);
+       produtos.setValor(valor);
+
+       status = dao.conectar();
+       if (!status) {
+           JOptionPane.showMessageDialog(null, "Erro de conexão");
+       } else {
+           resposta = dao.salvar(produtos);
+
+           if (resposta == 1) {
+               JOptionPane.showMessageDialog(null, "Dados incluídos com sucesso");
+               this.limparCamposEntradaDados();
+           } else if (resposta == 1062) {
+               JOptionPane.showMessageDialog(null, "Produto já cadastrado");
+           } else {
+               JOptionPane.showMessageDialog(null, "Erro ao tentar inserir dados");
+           }
+       }
+
+       dao.desconectar();
+
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     private void btnProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProdutosActionPerformed
         listagemVIEW listagem = new listagemVIEW(); 
         listagem.setVisible(true);
     }//GEN-LAST:event_btnProdutosActionPerformed
-
+    
+     private void limparCamposEntradaDados() {
+        // Limpa os campos
+        cadastroNome.setText("");
+        cadastroValor.setText("");
+    }
+    
     /**
      * @param args the command line arguments
      */
