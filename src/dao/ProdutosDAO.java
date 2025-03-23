@@ -37,6 +37,7 @@ public class ProdutosDAO {
             return false;
         }
     }
+    
     public void desconectar() {
         if (conn != null) {
             try {
@@ -69,8 +70,6 @@ public class ProdutosDAO {
         }
     }
     
-   
-    
     public List<ProdutosDTO> getProdutos(String nome) {
         String sql = "SELECT * FROM produtos WHERE nome LIKE ?";
         List<ProdutosDTO> listaProdutos = new ArrayList<>();
@@ -91,12 +90,48 @@ public class ProdutosDAO {
 
             return listaProdutos;
         } catch (Exception e) {
-            System.out.println("Erro ao buscar filmes: " + e.getMessage());
+            System.out.println("Erro ao buscar produtos: " + e.getMessage());
         }
 
         return listaProdutos;
     }
-   
+    
+    public ProdutosDTO buscarPorId(int id) {
+        ProdutosDTO produtos = null;
         
+        String sql = "SELECT * FROM produtos WHERE id = ?";
+        try {
+            PreparedStatement stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                produtos = new ProdutosDTO();
+                produtos.setId(rs.getInt("id"));
+                produtos.setNome(rs.getString("nome"));
+                produtos.setStatus(rs.getString("status"));
+                produtos.setValor(rs.getInt("valor"));
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar o produto: " + e.getMessage());
+        }
+        
+        return produtos;
+    }
+    
+    public int vender(int id) {
+        String sql = "UPDATE produtos set status = 'Vendido' WHERE id = ? and status = 'A venda'";
+        
+        try {
+            PreparedStatement stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, id);
+            return stmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Erro ao vender o produto: " + e.getMessage());
+            return 0;
+        }
+    }
+  
+    
 }
+
 

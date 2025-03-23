@@ -19,26 +19,20 @@ import javax.swing.table.DefaultTableModel;
  */
 public class listagemVIEW extends javax.swing.JFrame {
 
-
     public listagemVIEW() {
-        initComponents();
-        
+        initComponents();        
         preencherTabela();
     }
     
     public void preencherTabela () {
       ProdutosDAO produtosDAO = new ProdutosDAO();
       boolean conectado = produtosDAO.conectar();
-
       if (!conectado) {
           JOptionPane.showMessageDialog(null, "Erro de conexão com o banco de dados.");
           return;
       }
 
       List<ProdutosDTO> listaProdutos = produtosDAO.getProdutos(""); 
-
-      System.out.println("Produtos encontrados: " + listaProdutos.size());
-
       if (listaProdutos.isEmpty()) {
           JOptionPane.showMessageDialog(null, "Nenhum produto encontrado!");
       } else {
@@ -195,8 +189,53 @@ public class listagemVIEW extends javax.swing.JFrame {
                mensagemErro += erro + "\n";
            }
            JOptionPane.showMessageDialog(this, mensagemErro);
+           idProduto.setText("");
            idProduto.requestFocus();
            return; 
+        } else {
+            
+            ProdutosDAO produtosDAO = new ProdutosDAO();
+            boolean conectado = produtosDAO.conectar();
+            if (!conectado) {
+                JOptionPane.showMessageDialog(null, "Erro de conexão com o banco de dados.");
+                return;
+            }
+            
+            ProdutosDTO produtos = produtosDAO.buscarPorId(Integer.parseInt(id));            
+            if (produtos == null) {
+                JOptionPane.showMessageDialog(this, "Produto não cadastrado!");
+                idProduto.setText("");
+                idProduto.requestFocus();
+            } else {
+                if (!produtos.getStatus().toLowerCase().equals("a venda")) {
+                    JOptionPane.showMessageDialog(this, "Produto já vendido!");
+                    idProduto.requestFocus();
+                }
+                else {
+                    
+                    String[] options = {"Sim", "Não" };
+                    int vender = JOptionPane.showOptionDialog(
+                        rootPane,
+                        "Tem certeza que deseja vender o produto? ", 
+                        "", 
+                        JOptionPane.DEFAULT_OPTION, 
+                        JOptionPane.QUESTION_MESSAGE, 
+                        null, 
+                        options, 
+                        options[0]
+                    );
+                    
+                    if (vender == 0) {
+                        int retorno = produtosDAO.vender(Integer.parseInt(id));
+                        if (retorno == 1) {
+                            JOptionPane.showMessageDialog(this, "Produto vendido!");
+                            preencherTabela();
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Erro ao vender o produto!");
+                        }
+                    }
+                }
+            }
         }
     }//GEN-LAST:event_btnVenderActionPerformed
 
