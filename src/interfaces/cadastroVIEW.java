@@ -197,11 +197,14 @@ public class cadastroVIEW extends javax.swing.JFrame {
        if (!status) {
            JOptionPane.showMessageDialog(null, "Erro de conexão");
        } else {
+           
+           
            resposta = dao.salvar(produtos);
 
            if (resposta == 1) {
                JOptionPane.showMessageDialog(null, "Dados incluídos com sucesso");
                this.limparCamposEntradaDados();
+               cadastroNome.requestFocus();
            } else if (resposta == 1062) {
                JOptionPane.showMessageDialog(null, "Produto já cadastrado");
            } else {

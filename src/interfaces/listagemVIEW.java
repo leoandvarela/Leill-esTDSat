@@ -4,6 +4,8 @@ package interfaces;
 import dao.ProdutosDTO;
 import dao.ProdutosDAO;
 import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -17,13 +19,45 @@ import javax.swing.table.DefaultTableModel;
  */
 public class listagemVIEW extends javax.swing.JFrame {
 
-    /**
-     * Creates new form listagemVIEW
-     */
+
     public listagemVIEW() {
         initComponents();
-        listarProdutos();
+        
+        preencherTabela();
     }
+    
+    public void preencherTabela () {
+      ProdutosDAO produtosDAO = new ProdutosDAO();
+      boolean conectado = produtosDAO.conectar();
+
+      if (!conectado) {
+          JOptionPane.showMessageDialog(null, "Erro de conexão com o banco de dados.");
+          return;
+      }
+
+      List<ProdutosDTO> listaProdutos = produtosDAO.getProdutos(""); 
+
+      System.out.println("Produtos encontrados: " + listaProdutos.size());
+
+      if (listaProdutos.isEmpty()) {
+          JOptionPane.showMessageDialog(null, "Nenhum produto encontrado!");
+      } else {
+          DefaultTableModel tabelaProdutos = (DefaultTableModel) tblProdutos.getModel();
+          tabelaProdutos.setNumRows(0);
+
+          for (ProdutosDTO produtos : listaProdutos) {
+              tabelaProdutos.addRow(new Object[]{
+                  produtos.getId(),
+                  produtos.getNome(),
+                  produtos.getValor(),
+                  produtos.getStatus()
+              });
+          }
+
+          tabelaProdutos.fireTableDataChanged(); 
+          tblProdutos.repaint(); 
+      }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -35,7 +69,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        listaProdutos = new javax.swing.JTable();
+        tblProdutos = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -47,7 +81,7 @@ public class listagemVIEW extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        listaProdutos.setModel(new javax.swing.table.DefaultTableModel(
+        tblProdutos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -58,7 +92,7 @@ public class listagemVIEW extends javax.swing.JFrame {
                 "ID", "Nome", "Valor", "Status"
             }
         ));
-        jScrollPane1.setViewportView(listaProdutos);
+        jScrollPane1.setViewportView(tblProdutos);
 
         jLabel1.setFont(new java.awt.Font("Lucida Fax", 0, 18)); // NOI18N
         jLabel1.setText("Lista de Produtos");
@@ -96,19 +130,19 @@ public class listagemVIEW extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(47, 47, 47)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnVender))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(btnVoltar)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(btnVendas, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnVender)))
                 .addContainerGap(49, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -140,12 +174,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
-        String id = id_produto_venda.getText();
         
-        ProdutosDAO produtosdao = new ProdutosDAO();
-        
-        //produtosdao.venderProduto(Integer.parseInt(id));
-        listarProdutos();
     }//GEN-LAST:event_btnVenderActionPerformed
 
     private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
@@ -202,28 +231,8 @@ public class listagemVIEW extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTable listaProdutos;
+    private javax.swing.JTable tblProdutos;
     // End of variables declaration//GEN-END:variables
 
-    private void listarProdutos(){
-        try {
-            ProdutosDAO produtosdao = new ProdutosDAO();
-            
-            DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
-            model.setNumRows(0);
-            
-            ArrayList<ProdutosDTO> listagem = produtosdao.listarProdutos();
-            
-            for(int i = 0; i < listagem.size(); i++){
-                model.addRow(new Object[]{
-                    listagem.get(i).getId(),
-                    listagem.get(i).getNome(),
-                    listagem.get(i).getValor(),
-                    listagem.get(i).getStatus()
-                });
-            }
-        } catch (Exception e) {
-        }
     
-    }
 }
