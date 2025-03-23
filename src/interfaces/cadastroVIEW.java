@@ -177,7 +177,7 @@ public class cadastroVIEW extends javax.swing.JFrame {
            try {
                valor = Integer.parseInt(valorTexto);
            } catch (NumberFormatException e) {
-               listaErros.add("O valor deve ser um número inteiro!");
+               listaErros.add("O valor deve ser um número inteiro positivo!");
            }
        }
 
