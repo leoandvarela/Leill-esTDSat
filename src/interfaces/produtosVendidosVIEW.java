@@ -4,6 +4,12 @@
  */
 package interfaces;
 
+import dao.ProdutosDAO;
+import dao.ProdutosDTO;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Leonardo
@@ -15,7 +21,38 @@ public class produtosVendidosVIEW extends javax.swing.JFrame {
      */
     public produtosVendidosVIEW() {
         initComponents();
+        preencherTela();
     }
+    
+    public void preencherTela () {
+        ProdutosDAO produtosDAO = new ProdutosDAO();
+      boolean conectado = produtosDAO.conectar();
+      if (!conectado) {
+          JOptionPane.showMessageDialog(null, "Erro de conexão com o banco de dados.");
+          return;
+      }
+      
+       List<ProdutosDTO> listaProdutos = produtosDAO.getProdutosVendidos(); 
+      if (listaProdutos.isEmpty()) {
+          JOptionPane.showMessageDialog(null, "Nenhum produto encontrado!");
+      } else {
+            DefaultTableModel tabelaProdutos = (DefaultTableModel) tblProdutosVendidos.getModel();
+            tabelaProdutos.setNumRows(0);
+
+            for (ProdutosDTO produtos : listaProdutos) {
+                tabelaProdutos.addRow(new Object[]{
+                    produtos.getId(),
+                    produtos.getNome(),
+                    produtos.getValor(),
+                    produtos.getStatus()
+                });
+            }
+            
+          tabelaProdutos.fireTableDataChanged(); 
+          tblProdutosVendidos.repaint(); 
+    }
+}
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,7 +67,7 @@ public class produtosVendidosVIEW extends javax.swing.JFrame {
         botaoVoltar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblProdutosVendidos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -45,7 +82,7 @@ public class produtosVendidosVIEW extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Lucida Fax", 0, 24)); // NOI18N
         jLabel1.setText("Lista de Produtos Vendidos");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblProdutosVendidos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -53,7 +90,7 @@ public class produtosVendidosVIEW extends javax.swing.JFrame {
                 "ID", "Nome", "Valor", "Status"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblProdutosVendidos);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -140,6 +177,6 @@ public class produtosVendidosVIEW extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblProdutosVendidos;
     // End of variables declaration//GEN-END:variables
 }

@@ -70,13 +70,12 @@ public class ProdutosDAO {
         }
     }
     
-    public List<ProdutosDTO> getProdutos(String nome) {
-        String sql = "SELECT * FROM produtos WHERE nome LIKE ?";
+    public List<ProdutosDTO> getProdutos() {
+        String sql = "SELECT * FROM produtos";
         List<ProdutosDTO> listaProdutos = new ArrayList<>();
 
         try {
             PreparedStatement stmt = this.conn.prepareStatement(sql);
-            stmt.setString(1, "%" + nome + "%");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -129,6 +128,32 @@ public class ProdutosDAO {
             System.out.println("Erro ao vender o produto: " + e.getMessage());
             return 0;
         }
+    }
+    
+    public List<ProdutosDTO> getProdutosVendidos() {
+        String sql = "SELECT * FROM produtos WHERE status = ?";
+        List<ProdutosDTO> listaProdutos = new ArrayList<>();
+
+        try {
+            PreparedStatement stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1,"Vendido");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ProdutosDTO produtos = new  ProdutosDTO();
+                produtos.setId(rs.getInt("id"));
+                produtos.setNome(rs.getString("nome"));
+                produtos.setStatus(rs.getString("status"));
+                produtos.setValor(rs.getInt("valor"));
+                listaProdutos.add(produtos);
+            }
+
+            return listaProdutos;
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar produtos: " + e.getMessage());
+        }
+
+        return listaProdutos;
     }
   
     

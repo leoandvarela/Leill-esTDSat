@@ -32,7 +32,7 @@ public class listagemVIEW extends javax.swing.JFrame {
           return;
       }
 
-      List<ProdutosDTO> listaProdutos = produtosDAO.getProdutos(""); 
+      List<ProdutosDTO> listaProdutos = produtosDAO.getProdutos(); 
       if (listaProdutos.isEmpty()) {
           JOptionPane.showMessageDialog(null, "Nenhum produto encontrado!");
       } else {
