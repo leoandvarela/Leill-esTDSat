@@ -23,7 +23,7 @@ public class ProdutosDAO {
     public boolean conectar(boolean mensagemConectadoExibida) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/leilao", "root", "#Leozinho2020#");
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/leilao", "root", "root");
 
             if (mensagemConectadoExibida) {
                 mensagem = "Conectado com sucesso";
